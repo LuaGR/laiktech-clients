@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Plant {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  marginConfigs MarginConfig[]
+  indirectCosts IndirectCost[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Operation {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ClientType {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  pricePerColor Decimal        @default(0) @db.Decimal(10, 2)
+  priceLinkType String         @default("Por estructura")
+  clients       Client[]
+  marginConfigs MarginConfig[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Client {
+  id            String         @id @default(uuid())
+  name          String
+  clientTypeId  String
+  clientType    ClientType     @relation(fields: [clientTypeId], references: [id], onDelete: Cascade)
+  pricePerColor Decimal        @default(0) @db.Decimal(10, 2)
+  priceLinkType String         @default("Por estructura")
+  marginConfigs MarginConfig[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([name, clientTypeId])
+}
+
+model MarginConfig {
+  id            String      @id @default(uuid())
+  plantId       String
+  plant         Plant       @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  clientTypeId  String?
+  clientType    ClientType? @relation(fields: [clientTypeId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        Client?     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  vol300        Decimal     @default(0) @db.Decimal(5, 2)
+  vol500        Decimal     @default(0) @db.Decimal(5, 2)
+  vol1T         Decimal     @default(0) @db.Decimal(5, 2)
+  vol3T         Decimal     @default(0) @db.Decimal(5, 2)
+  vol5T         Decimal     @default(0) @db.Decimal(5, 2)
+  vol10T        Decimal     @default(0) @db.Decimal(5, 2)
+  vol20T        Decimal     @default(0) @db.Decimal(5, 2)
+  vol30T        Decimal     @default(0) @db.Decimal(5, 2)
+  isOverride    Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([plantId, clientTypeId, clientId])
+}
+
+model IndirectCost {
+  id        String   @id @default(uuid())
+  plantId   String
+  plant     Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  name      String
+  amount    Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([plantId, name])
+}
