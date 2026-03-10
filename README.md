@@ -6,9 +6,11 @@ Módulo full-stack para gestionar márgenes de precios y costos indirectos por p
 
 - Configuración de márgenes por tipo de cliente en 8 rangos de volumen fijos (300, 500, 1T, 3T, 5T, 10T, 20T, 30T)
 - Alertas visuales cuando los márgenes son ≤ 5%
-- Herencia a nivel de categoría: actualizar una cabecera de categoría se propaga a todos sus hijos
+- Herencia a nivel de tipo de cliente: actualizar una cabecera se propaga a todas las empresas del tipo
 - Soporte para sobreescrituras manuales en celdas individuales
 - Gestión de costos indirectos por planta (ej: Alquiler, Luz, Agua)
+- Selección de planta por país (ej: Perú)
+- Operaciones configurables: Precios Base, Waste, Costos indirectos, Clientes, Comisiones, etc.
 
 ## Stack Tecnológico
 
@@ -29,14 +31,15 @@ Cada dominio de negocio es una carpeta de primer nivel con capas de Clean Archit
 
 ```
 src/
-├── Pricing/
+├── clients/
 │   ├── models/       Entidades de dominio
 │   ├── services/     Lógica de negocio
 │   └── adapters/     Resolvers GraphQL
-└── Inventory/
-    ├── models/
-    ├── services/
-    └── adapters/
+├── costs/
+│   ├── models/
+│   ├── services/
+│   └── adapters/
+└── shared/           Prisma singleton, utilidades comunes
 ```
 
 ### Frontend — Screaming + Clean Architecture + Scope Rule + Container/Presentational
@@ -45,13 +48,13 @@ Cada feature es una carpeta de primer nivel (Screaming) con capas de Clean Archi
 
 ```
 src/
-├── pricing/
-│   ├── models/               Tipos de la feature (.model.ts)
-│   ├── services/             Lógica pura, sin React (.service.ts)
-│   ├── adapters/             Queries/Mutations GraphQL (.adapter.ts)
-│   ├── hooks/                React hooks (use-*.ts)
-│   ├── pricing-container.tsx Container (raíz de la feature)
-│   └── components/           Componentes presentacionales
+├── clients/
+│   ├── models/                  Tipos de la feature (.model.ts)
+│   ├── services/                Lógica pura, sin React (.service.ts)
+│   ├── adapters/                Queries/Mutations GraphQL (.adapter.ts)
+│   ├── hooks/                   React hooks (use-*.ts)
+│   ├── clients-container.tsx    Container (raíz de la feature)
+│   └── components/              Componentes presentacionales
 ├── costs/
 ├── plant/
 ├── shared/

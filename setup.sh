@@ -17,20 +17,24 @@ if ! command -v docker compose &> /dev/null; then
     exit 1
 fi
 
-echo "[1/4] Building Docker images..."
+echo "[1/5] Building Docker images..."
 docker compose build
 
 echo ""
-echo "[2/4] Starting containers..."
+echo "[2/5] Starting containers..."
 docker compose up -d
 
 echo ""
-echo "[3/4] Waiting for PostgreSQL to be ready..."
+echo "[3/5] Waiting for PostgreSQL to be ready..."
 sleep 5
 
 echo ""
-echo "[4/4] Running database migrations..."
+echo "[4/5] Running database migrations..."
 docker compose exec backend npx prisma migrate deploy
+
+echo ""
+echo "[5/5] Seeding database..."
+docker compose exec backend npx prisma db seed
 
 echo ""
 echo "================================================"

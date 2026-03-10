@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "outDir": "./dist",
+        "rootDir": ".",
+        "baseUrl": ".",
+        "paths": {
+            "@shared/*": [
+                "src/shared/*"
+            ],
+            "@pricing/*": [
+                "src/Pricing/*"
+            ],
+            "@inventory/*": [
+                "src/Inventory/*"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*",
+        "prisma/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

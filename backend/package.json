@@ -1,0 +1,28 @@
+{
+    "name": "laiktech-clients-backend",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "start": "tsx src/index.ts",
+        "prisma:generate": "prisma generate",
+        "prisma:migrate": "prisma migrate dev",
+        "prisma:seed": "tsx prisma/seed.ts",
+        "prisma:studio": "prisma studio"
+    },
+    "prisma": {
+        "seed": "tsx prisma/seed.ts"
+    },
+    "dependencies": {
+        "@apollo/server": "^5.4.0",
+        "@prisma/client": "^6.4.1",
+        "graphql": "^16.10.0",
+        "graphql-tag": "^2.12.6"
+    },
+    "devDependencies": {
+        "@types/node": "^22.13.5",
+        "prisma": "^6.4.1",
+        "tsx": "^4.19.3",
+        "typescript": "^5.7.3"
+    }
+}
