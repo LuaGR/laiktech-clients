@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: laiktech-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: laiktech
+      POSTGRES_PASSWORD: laiktech_secret
+      POSTGRES_DB: quotation_config
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: laiktech-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://laiktech:laiktech_secret@postgres:5432/quotation_config
+      PORT: 4000
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: laiktech-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_GRAPHQL_URL: http://localhost:4000/graphql
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
