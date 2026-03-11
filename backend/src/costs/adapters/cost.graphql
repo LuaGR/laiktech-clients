@@ -1,0 +1,27 @@
+type IndirectCost {
+  id: ID!
+  plantId: ID!
+  name: String!
+  amount: Float!
+}
+
+input CreateCostInput {
+  plantId: ID!
+  name: String!
+  amount: Float!
+}
+
+input UpdateCostInput {
+  id: ID!
+  amount: Float!
+}
+
+extend type Query {
+  indirectCostsByPlant(plantId: ID!): [IndirectCost!]!
+}
+
+extend type Mutation {
+  createIndirectCost(input: CreateCostInput!): IndirectCost!
+  updateIndirectCost(input: UpdateCostInput!): IndirectCost!
+  deleteIndirectCost(id: ID!): IndirectCost!
+}
