@@ -3,6 +3,7 @@ import { startStandaloneServer } from '@apollo/server/standalone';
 import { loadSchema } from '@shared/schema-loader.js';
 import { prisma } from '@shared/prisma.js';
 import { clientResolvers } from '@clients/adapters/client.resolver.js';
+import { costResolvers } from '@costs/adapters/cost.resolver.js';
 
 async function bootstrap() {
     console.log("Loading GraphQL schema...");
@@ -11,9 +12,11 @@ async function bootstrap() {
     const resolvers = {
         Query: {
             ...clientResolvers.Query,
+            ...costResolvers.Query,
         },
         Mutation: {
             ...clientResolvers.Mutation,
+            ...costResolvers.Mutation,
         },
     };
 
