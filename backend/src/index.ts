@@ -21,6 +21,7 @@ async function bootstrap() {
         typeDefs,
         resolvers,
         introspection: process.env.NODE_ENV !== 'production',
+        csrfPrevention: false,
     });
 
     const port = Number(process.env.PORT) || 4000;
