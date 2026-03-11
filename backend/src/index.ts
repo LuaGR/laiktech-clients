@@ -1,7 +1,8 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import { loadSchema } from './shared/schema-loader.js';
-import { prisma } from './shared/prisma.js';
+import { loadSchema } from '@shared/schema-loader.js';
+import { prisma } from '@shared/prisma.js';
+import { clientResolvers } from '@clients/adapters/client.resolver.js';
 
 async function bootstrap() {
     console.log("Loading GraphQL schema...");
@@ -9,7 +10,10 @@ async function bootstrap() {
 
     const resolvers = {
         Query: {
-            _empty: () => 'Server is running',
+            ...clientResolvers.Query,
+        },
+        Mutation: {
+            ...clientResolvers.Mutation,
         },
     };
 
@@ -17,6 +21,7 @@ async function bootstrap() {
         typeDefs,
         resolvers,
         introspection: process.env.NODE_ENV !== 'production',
+        csrfPrevention: false,
     });
 
     const port = Number(process.env.PORT) || 4000;

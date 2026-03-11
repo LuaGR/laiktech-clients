@@ -1,0 +1,80 @@
+type Plant {
+  id: ID!
+  name: String!
+}
+
+type Operation {
+  id: ID!
+  name: String!
+  order: Int!
+}
+
+type ClientType {
+  id: ID!
+  name: String!
+  pricePerColor: Float!
+  priceLinkType: String!
+  clients: [Client!]
+  marginConfigs: [MarginConfig!]
+}
+
+type Client {
+  id: ID!
+  name: String!
+  clientTypeId: ID!
+  pricePerColor: Float!
+  priceLinkType: String!
+  marginConfigs: [MarginConfig!]
+}
+
+type MarginConfig {
+  id: ID!
+  plantId: ID!
+  clientTypeId: ID
+  clientId: ID
+  vol300: Float!
+  vol500: Float!
+  vol1T: Float!
+  vol3T: Float!
+  vol5T: Float!
+  vol10T: Float!
+  vol20T: Float!
+  vol30T: Float!
+  isOverride: Boolean!
+}
+
+type Query {
+  plants: [Plant!]!
+  operations: [Operation!]!
+  clientTypesByPlant(plantId: ID!): [ClientType!]!
+}
+
+input UpdateMarginInput {
+  id: ID!
+  vol300: Float
+  vol500: Float
+  vol1T: Float
+  vol3T: Float
+  vol5T: Float
+  vol10T: Float
+  vol20T: Float
+  vol30T: Float
+}
+
+input UpdateClientTypeHeaderInput {
+  pricePerColor: Float
+  priceLinkType: String
+}
+
+input UpdateClientInput {
+  pricePerColor: Float
+  priceLinkType: String
+}
+
+type Mutation {
+  updateMargin(input: UpdateMarginInput!): MarginConfig!
+  updateClientTypeMargins(clientTypeId: ID!, plantId: ID!, input: UpdateMarginInput!): [MarginConfig!]!
+  resetClientOverride(marginConfigId: ID!): MarginConfig!
+  updateClientType(id: ID!, input: UpdateClientTypeHeaderInput!): ClientType!
+  updateClient(id: ID!, input: UpdateClientInput!): Client!
+}
