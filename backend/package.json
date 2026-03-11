@@ -16,10 +16,12 @@
     "dependencies": {
         "@apollo/server": "^5.4.0",
         "@prisma/client": "^6.4.1",
+        "glob": "^13.0.6",
         "graphql": "^16.10.0",
         "graphql-tag": "^2.12.6"
     },
     "devDependencies": {
+        "@types/glob": "^8.1.0",
         "@types/node": "^22.13.5",
         "prisma": "^6.4.1",
         "tsx": "^4.19.3",
