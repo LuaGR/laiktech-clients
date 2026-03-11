@@ -51,7 +51,8 @@ src/
 ├── clients/
 │   ├── models/                  Tipos de la feature (.model.ts)
 │   ├── services/                Lógica pura, sin React (.service.ts)
-│   ├── adapters/                Queries/Mutations GraphQL (.adapter.ts)
+│   ├── graphql/                 Queries/Mutations en Template Strings (.query.ts, .mutation.ts)
+│   ├── adapters/                Mapeo bidireccional de DTOs (Backend ↔ Frontend) (.adapter.ts)
 │   ├── hooks/                   React hooks (use-*.ts)
 │   ├── clients-container.tsx    Container (raíz de la feature)
 │   └── components/              Componentes presentacionales
