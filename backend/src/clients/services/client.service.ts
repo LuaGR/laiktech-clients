@@ -1,10 +1,10 @@
 import { prisma } from '@shared/prisma.js';
 import type { Prisma } from '@prisma/client';
-import type { Plant, Operation, ClientType, Client, UpdateClientTypeHeaderInput, UpdateClientInput } from '@clients/models/client.model.js';
+import type { Plant, Operation, ClientType, Client, UpdateClientTypeHeaderInput, UpdateClientInput, CreateClientInput } from '@clients/models/client.model.js';
 
 type MarginConfigPayload = Prisma.MarginConfigGetPayload<{}>;
 type ClientPayload = Prisma.ClientGetPayload<{}> & { marginConfigs?: MarginConfigPayload[] };
-type ClientTypePayload = Prisma.ClientTypeGetPayload<{}> & { marginConfigs?: MarginConfigPayload[], clients?: ClientPayload[] };
+type ClientTypePayload = Prisma.ClientTypeGetPayload<{}> & { marginConfigs?: MarginConfigPayload[]; clients?: ClientPayload[] };
 type PlantPayload = Prisma.PlantGetPayload<{}>;
 type OperationPayload = Prisma.OperationGetPayload<{}>;
 
@@ -112,4 +112,58 @@ export async function updateClient(id: string, input: UpdateClientInput): Promis
   });
 
   return mapClientToDomain(updated);
+}
+
+export async function createClient(input: CreateClientInput): Promise<Client> {
+  const clientType = await prisma.clientType.findUnique({
+    where: { id: input.clientTypeId },
+  });
+
+  if (!clientType) {
+    throw new Error('ClientType not found');
+  }
+
+  const headerMargin = await prisma.marginConfig.findFirst({
+    where: {
+      plantId: input.plantId,
+      clientTypeId: input.clientTypeId,
+      clientId: null,
+    },
+  });
+
+  const client = await prisma.client.create({
+    data: {
+      name: input.name,
+      clientTypeId: input.clientTypeId,
+      pricePerColor: input.pricePerColor ?? clientType.pricePerColor,
+      priceLinkType: clientType.priceLinkType,
+    },
+  });
+
+  await prisma.marginConfig.create({
+    data: {
+      plantId: input.plantId,
+      clientId: client.id,
+      vol300: headerMargin?.vol300 ?? 0,
+      vol500: headerMargin?.vol500 ?? 0,
+      vol1T: headerMargin?.vol1T ?? 0,
+      vol3T: headerMargin?.vol3T ?? 0,
+      vol5T: headerMargin?.vol5T ?? 0,
+      vol10T: headerMargin?.vol10T ?? 0,
+      vol20T: headerMargin?.vol20T ?? 0,
+      vol30T: headerMargin?.vol30T ?? 0,
+      isOverride: false,
+    },
+  });
+
+  const created = await prisma.client.findUniqueOrThrow({
+    where: { id: client.id },
+    include: {
+      marginConfigs: {
+        where: { plantId: input.plantId },
+      },
+    },
+  });
+
+  return mapClientToDomain(created);
 }

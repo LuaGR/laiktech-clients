@@ -71,7 +71,23 @@ input UpdateClientInput {
   priceLinkType: String
 }
 
+input CreateClientInput {
+  name: String!
+  clientTypeId: ID!
+  plantId: ID!
+  pricePerColor: Float
+}
+
+input CreateMarginOverrideInput {
+  clientId: ID!
+  plantId: ID!
+  field: String!
+  value: Float!
+}
+
 type Mutation {
+  createClient(input: CreateClientInput!): Client!
+  createMarginOverride(input: CreateMarginOverrideInput!): MarginConfig!
   updateMargin(input: UpdateMarginInput!): MarginConfig!
   updateClientTypeMargins(clientTypeId: ID!, plantId: ID!, input: UpdateMarginInput!): [MarginConfig!]!
   resetClientOverride(marginConfigId: ID!): MarginConfig!
