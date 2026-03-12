@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+export const VOLUME_HEADERS = [
+  "300 KG",
+  "500 KG",
+  "1 T",
+  "3 T",
+  "5 T",
+  "10 T",
+  "20 T",
+  "30 T",
+] as const;
+
 export const VOLUME_FIELDS = [
   "vol300",
   "vol500",
