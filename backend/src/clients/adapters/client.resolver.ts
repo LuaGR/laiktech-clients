@@ -1,6 +1,6 @@
-import { getPlants, getOperations, getClientTypesByPlant, updateClientType, updateClient } from '../services/client.service.js';
-import { updateMargin, updateClientTypeMargins, resetClientOverride } from '../services/margin.service.js';
-import type { UpdateMarginInput, UpdateClientTypeHeaderInput, UpdateClientInput } from '../models/client.model.js';
+import { getPlants, getOperations, getClientTypesByPlant, updateClientType, updateClient, createClient } from "../services/client.service.js";
+import { updateMargin, updateClientTypeMargins, resetClientOverride, createMarginOverride } from "../services/margin.service.js";
+import type { UpdateMarginInput, UpdateClientTypeHeaderInput, UpdateClientInput, CreateClientInput, CreateMarginOverrideInput } from "../models/client.model.js";
 
 export const clientResolvers = {
   Query: {
@@ -15,6 +15,12 @@ export const clientResolvers = {
     },
   },
   Mutation: {
+    createMarginOverride: async (parent: undefined, { input }: { input: CreateMarginOverrideInput }) => {
+      return await createMarginOverride(input);
+    },
+    createClient: async (parent: undefined, { input }: { input: CreateClientInput }) => {
+      return await createClient(input);
+    },
     updateMargin: async (parent: undefined, { input }: { input: UpdateMarginInput }) => {
       return await updateMargin(input);
     },

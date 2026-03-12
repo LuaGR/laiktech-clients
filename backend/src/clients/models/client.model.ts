@@ -65,3 +65,17 @@ export interface UpdateClientInput {
   pricePerColor?: number;
   priceLinkType?: string;
 }
+
+export interface CreateClientInput {
+  name: string;
+  clientTypeId: string;
+  plantId: string;
+  pricePerColor?: number;
+}
+
+export interface CreateMarginOverrideInput {
+  clientId: string;
+  plantId: string;
+  field: string;
+  value: number;
+}

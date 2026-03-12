@@ -1,6 +1,6 @@
 import { prisma } from '@shared/prisma.js';
 import type { Prisma } from '@prisma/client';
-import type { MarginConfig, UpdateMarginInput } from '@clients/models/client.model.js';
+import type { MarginConfig, UpdateMarginInput, CreateMarginOverrideInput } from '@clients/models/client.model.js';
 
 type MarginConfigPayload = Prisma.MarginConfigGetPayload<{}>;
 
@@ -49,11 +49,7 @@ export async function updateMargin(input: UpdateMarginInput): Promise<MarginConf
   return mapMarginToDomain(margin);
 }
 
-export async function updateClientTypeMargins(
-  clientTypeId: string,
-  plantId: string,
-  input: UpdateMarginInput
-): Promise<MarginConfig[]> {
+export async function updateClientTypeMargins(clientTypeId: string, plantId: string, input: UpdateMarginInput): Promise<MarginConfig[]> {
   await prisma.marginConfig.update({
     where: { id: input.id },
     data: {
@@ -74,7 +70,7 @@ export async function updateClientTypeMargins(
     select: { id: true },
   });
 
-  const clientIds = clients.map(client => client.id);
+  const clientIds = clients.map((client) => client.id);
 
   if (clientIds.length > 0) {
     await prisma.marginConfig.updateMany({
@@ -99,10 +95,7 @@ export async function updateClientTypeMargins(
   const updatedMargins = await prisma.marginConfig.findMany({
     where: {
       plantId,
-      OR: [
-        { clientTypeId },
-        { clientId: { in: clientIds } },
-      ],
+      OR: [{ clientTypeId }, { clientId: { in: clientIds } }],
     },
   });
 
@@ -146,4 +139,56 @@ export async function resetClientOverride(marginConfigId: string): Promise<Margi
   });
 
   return mapMarginToDomain(resetMargin);
+}
+
+export async function createMarginOverride(input: CreateMarginOverrideInput): Promise<MarginConfig> {
+  const existing = await prisma.marginConfig.findFirst({
+    where: {
+      plantId: input.plantId,
+      clientId: input.clientId,
+    },
+  });
+
+  if (existing) {
+    const updated = await prisma.marginConfig.update({
+      where: { id: existing.id },
+      data: {
+        [input.field]: input.value,
+        isOverride: true,
+      },
+    });
+    return mapMarginToDomain(updated);
+  }
+
+  const client = await prisma.client.findUniqueOrThrow({
+    where: { id: input.clientId },
+    include: { clientType: true },
+  });
+
+  const headerMargin = await prisma.marginConfig.findFirst({
+    where: {
+      plantId: input.plantId,
+      clientTypeId: client.clientTypeId,
+      clientId: null,
+    },
+  });
+
+  const created = await prisma.marginConfig.create({
+    data: {
+      plantId: input.plantId,
+      clientId: input.clientId,
+      vol300: headerMargin?.vol300 ?? 0,
+      vol500: headerMargin?.vol500 ?? 0,
+      vol1T: headerMargin?.vol1T ?? 0,
+      vol3T: headerMargin?.vol3T ?? 0,
+      vol5T: headerMargin?.vol5T ?? 0,
+      vol10T: headerMargin?.vol10T ?? 0,
+      vol20T: headerMargin?.vol20T ?? 0,
+      vol30T: headerMargin?.vol30T ?? 0,
+      isOverride: true,
+      [input.field]: input.value,
+    },
+  });
+
+  return mapMarginToDomain(created);
 }
