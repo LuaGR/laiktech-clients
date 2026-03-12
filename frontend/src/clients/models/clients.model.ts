@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+export const VOLUME_FIELDS = [
+  "vol300",
+  "vol500",
+  "vol1T",
+  "vol3T",
+  "vol5T",
+  "vol10T",
+  "vol20T",
+  "vol30T",
+] as const;
+
+export type VolumeField = (typeof VOLUME_FIELDS)[number];
+
 export const marginConfigSchema = z.object({
   id: z.string(),
   plantId: z.string(),
