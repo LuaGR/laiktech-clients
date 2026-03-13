@@ -1,11 +1,11 @@
 import { useMemo, useState, useCallback } from "react";
-import { ActionBar } from "./components/controls/action-bar";
+import { ActionBar } from "@shared/components/action-bar";
 import { useClients } from "@clients/hooks/use-clients";
 import { ClientTypeSection } from "./components/table/client-type-section";
 import { TableColGroup } from "./components/table/table-col-group";
 import { ClientsTableHeader } from "./components/table/clients-table-header";
 import { OverridesToggle } from "./components/controls/overrides-toggle";
-import { SavedToast } from "./components/controls/saved-toast";
+import { SavedToast } from "@shared/components/saved-toast";
 
 export function ClientsContainer() {
   const {
@@ -106,7 +106,8 @@ export function ClientsContainer() {
     <div className="h-full min-h-0 flex flex-col gap-4 relative">
       <SavedToast visible={showSavedToast} />
 
-      <div className="flex items-center justify-end shrink-0">
+      <div className="flex items-center justify-between shrink-0">
+        <h1 className="text-xl font-semibold text-brand-900">Clientes</h1>
         <OverridesToggle
           checked={showOnlyOverrides}
           onChange={setShowOnlyOverrides}
