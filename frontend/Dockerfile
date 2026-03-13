@@ -1,11 +1,12 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
-COPY . .
+COPY package*.json ./
+RUN npm install
 
-RUN if [ -f "package.json" ]; then npm install; fi
+COPY . .
 
 EXPOSE 5173
 
-CMD if [ -f "package.json" ]; then npm run dev -- --host; else tail -f /dev/null; fi
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
