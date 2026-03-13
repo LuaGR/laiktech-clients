@@ -23,7 +23,7 @@ export function useClients() {
   const selectedPlantId = usePlantStore((state) => state.selectedPlantId);
   const [draft, setDraft] = useState<DraftChanges>({ ...EMPTY_DRAFT });
 
-  const { data, loading, error, refetch } = useQuery(
+  const { data, previousData, loading, error, refetch } = useQuery(
     GET_CLIENT_TYPES_BY_PLANT,
     {
       variables: { plantId: selectedPlantId },
@@ -41,7 +41,7 @@ export function useClients() {
   const [createMarginOverrideMutation] = useMutation(CREATE_MARGIN_OVERRIDE);
   const [updateClientMutation] = useMutation(UPDATE_CLIENT);
 
-  const clientTypes = adaptClientTypesResponse(data);
+  const clientTypes = adaptClientTypesResponse(data ?? previousData);
 
   const hasPendingChanges =
     Object.keys(draft.clientEdits).length > 0 ||

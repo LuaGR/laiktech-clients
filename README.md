@@ -7,10 +7,10 @@ Módulo full-stack para gestionar márgenes de precios y costos indirectos por p
 - Configuración de márgenes por tipo de cliente en 8 rangos de volumen fijos (300, 500, 1T, 3T, 5T, 10T, 20T, 30T)
 - Alertas visuales cuando los márgenes son ≤ 5%
 - Herencia a nivel de tipo de cliente: actualizar una cabecera se propaga a todas las empresas del tipo
-- Soporte para sobreescrituras manuales en celdas individuales
+- Soporte para sobreescrituras manuales en celdas individuales con flag `isOverride`
 - Gestión de costos indirectos por planta (ej: Alquiler, Luz, Agua)
-- Selección de planta por país (ej: Perú)
-- Operaciones configurables: Precios Base, Waste, Costos indirectos, Clientes, Comisiones, etc.
+- Navegación entre vistas: **Clientes** y **Costos indirectos** desde el sidebar
+- Selección de planta activa por país (ej: Perú)
 
 ## Stack Tecnológico
 
@@ -44,22 +44,22 @@ src/
 
 ### Frontend — Screaming + Clean Architecture + Scope Rule + Container/Presentational
 
-Cada feature es una carpeta de primer nivel (Screaming) con capas de Clean Architecture internas (models, services, adapters, hooks). El Scope Rule determina dónde vive cada archivo. El Container es el punto de entrada en la raíz de la feature, los componentes presentacionales van en components/.
+Cada feature es una carpeta de primer nivel con capas internas. El Scope Rule determina dónde vive cada archivo: si algo se usa solo en un feature, vive local; si se usa en 2+ features, sube a `shared/`.
 
 ```
 src/
 ├── clients/
 │   ├── models/                  Tipos de la feature (.model.ts)
 │   ├── services/                Lógica pura, sin React (.service.ts)
-│   ├── graphql/                 Queries/Mutations en Template Strings (.query.ts, .mutation.ts)
-│   ├── adapters/                Mapeo bidireccional de DTOs (Backend ↔ Frontend) (.adapter.ts)
-│   ├── hooks/                   React hooks (use-*.ts)
+│   ├── graphql/                 Queries/Mutations (.query.ts, .mutation.ts)
+│   ├── adapters/                Mapeo DTO Backend ↔ Frontend (.adapter.ts)
+│   ├── hooks/                   React facade (use-*.ts)
 │   ├── clients-container.tsx    Container (raíz de la feature)
 │   └── components/              Componentes presentacionales
 ├── costs/
 ├── plant/
-├── shared/
-└── layout/
+├── layout/
+└── shared/                      Componentes y utilidades usados en 2+ features
 ```
 
 ## Inicio Rápido
@@ -94,6 +94,7 @@ make setup
 | `make logs` | Ver logs de todos los servicios |
 | `make logs-backend` | Ver logs del backend |
 | `make logs-frontend` | Ver logs del frontend |
+| `make logs-db` | Ver logs de PostgreSQL |
 | `make migrate` | Ejecutar migraciones (dev) |
 | `make seed` | Ejecutar seed de datos |
 | `make studio` | Abrir Prisma Studio |
@@ -115,3 +116,58 @@ Configuradas automáticamente en `docker-compose.yml`. Para desarrollo local sin
 DATABASE_URL=postgresql://laiktech:laiktech_secret@localhost:5432/quotation_config
 PORT=4000
 ```
+
+## Desarrollo Local sin Docker
+
+Si se prefiere correr los servicios directamente en la máquina:
+
+```bash
+# Base de datos (requiere PostgreSQL 15 corriendo localmente)
+cd backend
+npm install
+npx prisma migrate dev
+npx prisma db seed
+npm run dev
+
+# Frontend (en otra terminal)
+cd frontend
+npm install
+npm run dev
+```
+
+> **Importante:** cada vez que se modifique un archivo `.graphql` en el backend, es necesario reiniciar el servidor para que Apollo recargue el schema. Con `npm run dev` (tsx watch) basta con guardar el archivo para que se reinicie automáticamente.
+
+## Diseño de Base de Datos
+
+Ver [`docs/db-design.md`](./docs/db-design.md) para el diagrama entidad-relación completo y la explicación de la lógica de herencia de márgenes.
+
+## Git
+
+### Estrategia de Branching
+
+```
+main
+├── chore/apollo-setup
+├── chore/frontend-setup
+├── feature/clients-api
+├── feature/clients-ui
+├── feature/costs-ui
+└── feature/ui-polish
+```
+
+### Mantener la branch actualizada con main
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+### Conflicto en `schema.graphql`
+
+Si otro desarrollador edita el mismo `schema.graphql`:
+
+1. `git fetch origin && git rebase origin/main`
+2. Abrir el archivo en conflicto y resolver manualmente — los dos bloques deben coexistir (no elegir uno sobre el otro sino integrarlos)
+3. `git add backend/src/clients/adapters/client.graphql`
+4. `git rebase --continue`
+5. Reiniciar el servidor backend para que Apollo recargue el schema unificado

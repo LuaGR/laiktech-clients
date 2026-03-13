@@ -76,7 +76,7 @@ export function ClientsContainer() {
     }
   }, [handleSave]);
 
-  if (loading) {
+  if (loading && clientTypes.length === 0) {
     return (
       <div className="h-full flex items-center justify-center p-8 text-brand-500">
         Cargando configuración de clientes...
