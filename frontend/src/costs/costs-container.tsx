@@ -36,7 +36,7 @@ export function CostsContainer() {
   }, [handleSave]);
 
 
-  if (loading) {
+  if (loading && indirectCosts.length === 0) {
     return (
       <div className="h-full flex items-center justify-center p-8 text-brand-500">
         Cargando costos indirectos...

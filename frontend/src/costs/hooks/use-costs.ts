@@ -15,7 +15,7 @@ export function useCosts() {
   const selectedPlantId = usePlantStore((state) => state.selectedPlantId);
   const [draft, setDraft] = useState<DraftCosts>({ ...EMPTY_DRAFT_COSTS });
 
-  const { data, loading, error, refetch } = useQuery(
+  const { data, previousData, loading, error, refetch } = useQuery(
     GET_INDIRECT_COSTS_BY_PLANT,
     {
       variables: { plantId: selectedPlantId },
@@ -27,7 +27,7 @@ export function useCosts() {
   const [updateIndirectCostMutation] = useMutation(UPDATE_INDIRECT_COST);
   const [deleteIndirectCostMutation] = useMutation(DELETE_INDIRECT_COST);
 
-  const indirectCosts = adaptIndirectCostsResponse(data);
+  const indirectCosts = adaptIndirectCostsResponse(data ?? previousData);
 
   const hasPendingChanges = Object.keys(draft.edits).length > 0;
 
